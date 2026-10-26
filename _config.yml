@@ -1,0 +1,15 @@
+# 站点总配置：改这里会影响所有页面
+title: 虎鲸神话故事馆
+author: Cerenothoa
+# 站头那句“当前连载系列：……”
+current_series: 比斯特
+
+url: https://orcinushinwa.github.io
+baseurl: ""
+lang: zh-CN
+
+# 这些文件只给自己看，不发布到网站上
+exclude:
+  - README.md
+  - tools
+  - "预览.cmd"

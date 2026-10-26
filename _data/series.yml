@@ -1,0 +1,5 @@
+# 故事系列清单：几个系列就写几行
+# 章节页 front matter 里的 series: beast 会引用这里的 beast
+beast:
+  title: 比斯特
+  url: /story-list/beast-story/

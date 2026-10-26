@@ -1,0 +1,5 @@
+# 只给自己看的临时文件，不发布、不提交
+tools/_pylibs/
+tools/_orig/
+tools/_tmp/
+_site_local/

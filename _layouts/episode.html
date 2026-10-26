@@ -1,0 +1,43 @@
+---
+layout: default
+---
+{%- comment -%}
+  章节页模板：整站 103 个故事页共用这一个文件。
+  正文在各自的 .html 文件里，其余（标题、面包屑、上一话/下一话）全部自动生成。
+{%- endcomment -%}
+{% assign series = site.data.series[page.series] %}
+{% assign main = site.pages | where: "series", page.series | where: "kind", "main" | sort: "order" %}
+{% assign has_prev = false %}
+{% assign has_next = false %}
+{% assign seen = false %}
+{% if page.kind == "extra" %}
+  {% assign prev_list = main | where: "order", page.after %}
+  {% assign prev = prev_list | first %}
+  {% if prev %}{% assign has_prev = true %}{% endif %}
+  {% assign next_order = page.after | plus: 1 %}
+  {% assign next_list = main | where: "order", next_order %}
+  {% assign next = next_list | first %}
+  {% if next %}{% assign has_next = true %}{% endif %}
+{% else %}
+  {% for m in main %}
+    {% if m.url == page.url %}
+      {% assign seen = true %}
+    {% elsif seen == false %}
+      {% assign prev = m %}{% assign has_prev = true %}
+    {% elsif has_next == false %}
+      {% assign next = m %}{% assign has_next = true %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+<div id="page-title">
+{{ page.title }}
+</div>
+<div id="page-content">
+<div id="breadcrumbs">
+<a href="{{ '/story-list/' | relative_url }}">故事目录</a>  &raquo;  <a href="{{ series.url | relative_url }}">{{ series.title }}</a>  &raquo;  {{ page.short_title | default: page.title }}
+</div>
+{{ content }}<div class="footer-wikiwalk-nav" style="text-align: center;">
+<p>&#171; {% if has_prev %}<a href="{{ prev.url | relative_url }}">{{ prev.label }}</a>{% else %}<a href="{{ series.url | relative_url }}">故事系列</a>{% endif %} | {{ page.label }} | {% if has_next %}<a href="{{ next.url | relative_url }}">{{ next.label }}</a>{% elsif page.next_label %}{{ page.next_label }}{% else %}敬请期待{% endif %} &#187;{% if page.nav_extra %}<br />
+{{ page.nav_extra }}{% endif %}</p>
+</div>
+</div>
