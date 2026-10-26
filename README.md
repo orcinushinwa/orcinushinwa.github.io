@@ -17,7 +17,7 @@
 > 页面 = 模板（`_layouts/`）+ 数据（每个页面开头的 `---` 那几行）+ 正文
 
 站头、导航、面包屑、上一话/下一话、页脚，全站只写一次，放在 `_layouts/` 里。
-所以**改一次模板，105 个页面会一起变**。
+所以**改一次模板，全站上百个页面会一起变**。
 
 ```
 _config.yml          站点总配置（站名、作者、当前连载系列）
@@ -28,7 +28,7 @@ _layouts/
   page.html          普通页：首页、关于、鸣谢、404
 story-list/beast-story/*.html   每个故事页 = 开头几行 + 正文
 style.css            全站样式
-tools/               一次性迁移脚本和验收脚本（不发布）
+tools/               本地预览用的小脚本（不发布）
 ```
 
 ### 新写一话
@@ -61,6 +61,24 @@ after: 87            ← 放在第087话和第088话之间
 
 导航里它的"上一话/下一话"会自动指向 `after` 和 `after + 1` 这两话。
 
+### 想让导航"跳号"或指向还没写的页面
+
+默认规则是自动算的，但可以手动覆盖。四个字段，写哪个覆盖哪个：
+
+```yaml
+prev_label: "番外第c话"                              # 左侧显示的字
+prev_url: "/story-list/beast-story/water-hyacinth.html"
+next_label: "第070话"
+next_url: "/story-list/beast-story/070.html"
+```
+
+用途举例：
+
+- **番外刻意跳号**（月季接在 065 和 070 之间、风信子接在番外c之后、洋紫荆接在番外004之后）——就是靠这几个字段固定的
+- **下一话还没写**：写 `next_label: "第088话"` + `next_url: ".../088.html"`，读者点进去会落到 404 催更页，这是刻意留的钩子
+
+注意：**手动覆盖优先于自动计算**。所以跳号是一旦写了就一直生效；哪天不想跳了，把那两行删掉，导航会自动回到按 `order` / `after` 算出来的邻居。
+
 ### 想改全站的东西
 
 | 想改什么 | 改哪个文件 |
@@ -81,25 +99,26 @@ after: 87            ← 放在第087话和第088话之间
    ```
 2. 新页面里用 `series: "chairs"`，面包屑和导航就自动跟着走了。
 
+### 下一话还没写的时候
+
+导航里可以留一个**故意指向不存在页面的链接**，读者点进去会看到 404 催更页。用 `next_label` + `next_url` 两个字段：
+
+```yaml
+next_label: "第088话"
+next_url: "/story-list/beast-story/088.html"
+```
+
+等 `088.html` 真的建好了，链接会自动变成真链接，这两行留着也不碍事（真下一话优先）。
+
 ### 本地检查（可选）
 
 推送后 GitHub Pages 会自动构建，构建失败时旧页面会继续留在线上，不会白屏。
-想先在本地看看效果，需要装 Python 的 `pyyaml` 和 `python-liquid`，然后：
+想先在本地看看效果，需要装 Python 的 `pyyaml` 和 `python-liquid`，然后双击仓库根目录的 `预览.cmd`（或运行）：
 
 ```
 python tools/preview.py
-python -m http.server 8000 --directory _site_local
 ```
 
-打开 http://localhost:8000/ 就能看到整站（不用装 Ruby）。
+它会把整站渲染到 `_site_local/`，然后直接用浏览器打开 `_site_local/index.html` 就行——页面里的链接都改成了相对路径，不需要起服务器。
 
-想核对"重构后有没有丢内容"：
-
-```
-python tools/verify.py
-```
-
-它会渲染整站并和 `tools/_orig/`（重构前的原始页面）逐页比对，确认没有内容丢失。
-
-> `tools/_orig/`、`tools/_pylibs/`、`_site_local/` 只在本机留底，已写进 `.gitignore`，不会上传。
-> 确认重构没问题后，`tools/_orig/` 可以整个删掉。
+> `_site_local/` 只是本机预览，已写进 `.gitignore`，不会上传。
